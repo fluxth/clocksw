@@ -51,10 +51,12 @@ impl Matrix {
         opts.set_pwm_lsb_nanoseconds(500);
         opts.set_limit_refresh(80);
 
-        // TODO: make this work
-        // if std::env::var("DAEMON").unwrap_or_default().as_str() == "1" {
-            run_opts.set_daemon(true);
-        // }
+        for arg in std::env::args() {
+            if arg.as_str().to_ascii_lowercase() == "daemon" {
+                run_opts.set_daemon(true);
+                break
+            }
+        }
 
         Ok((opts, run_opts))
     }
