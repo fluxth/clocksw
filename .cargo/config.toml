@@ -1,0 +1,18 @@
+[build]
+target = "arm-unknown-linux-gnueabihf"
+
+[profile.release]
+opt-level = 3
+debug = false
+debug-assertions = false
+lto = "thin"
+
+[target.arm-unknown-linux-gnueabihf]
+linker = "clang"
+rustflags = [ 
+    "-C", "link-arg=-L/home/flux/lib/rpi-rgb-led-matrix/lib", 
+    "-C", "link-arg=--target=arm-unknown-linux-gnueabihf", 
+    "-C", "link-arg=--sysroot=/home/flux/rpi_rootfs/rootfs/",
+    "-C", "link-arg=-fuse-ld=lld",
+    # "-C", "link-arg=-s",
+]

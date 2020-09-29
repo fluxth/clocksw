@@ -1,0 +1,17 @@
+[package]
+name = "clocksw"
+version = "0.1.0"
+authors = ["fluxTH <fuu.thitat@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+debug-emulator = []
+
+[dependencies]
+rpi-led-matrix = { version = "0.2", features = ["embeddedgraphics"] }
+embedded-graphics = "0.6"
+profont = "0.4"
+chrono = "0.4"
+clap = "2.33"
