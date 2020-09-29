@@ -12,8 +12,8 @@ impl Display {
     #[inline]
     pub fn draw(&mut self, canvas: &mut LedCanvas) -> bool {
         canvas.clear();
-
-        // TODO: Implement constant fps
+        
+        // TODO: Implement selective draw; make view sleep itself
         self.current_view.draw_next_frame(canvas)
     }
 
