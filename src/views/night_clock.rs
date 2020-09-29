@@ -38,6 +38,7 @@ impl View for NightClockView {
         }
     }
 
+    #[inline]
     fn draw_next_frame(&mut self, canvas: &mut LedCanvas) -> bool {
         // let (width, height) = canvas.canvas_size();
 
@@ -81,7 +82,7 @@ impl View for NightClockView {
 
 
         if self.temp_count == 0 {
-            self.temp_count = 5;
+            self.temp_count = 100;
             self.temp_cache = utils::get_cpu_temperature().unwrap()
         } else {
             self.temp_count -= 1;
