@@ -14,4 +14,5 @@ rpi-led-matrix = { version = "0.2", features = ["embeddedgraphics"] }
 embedded-graphics = "0.6"
 profont = "0.4"
 chrono = "0.4"
+spin_sleep = "1.0"
 clap = "2.33"
