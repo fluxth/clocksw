@@ -1,3 +1,4 @@
+// use crate::app::{ App }; 
 use rpi_led_matrix::{
     LedMatrix,
     LedCanvas,
@@ -11,14 +12,21 @@ pub struct Matrix {
 
 impl Matrix {
 
+    pub fn attach_to_app(&mut self) -> Result<(), &'static str> {
+        Ok(())
+    }
+
+    #[inline]
     pub fn swap(&self, canvas: LedCanvas) -> LedCanvas {
         self.led_matrix.swap(canvas)
     }
 
+    #[inline]
     pub fn canvas(&self) -> LedCanvas {
         self.led_matrix.canvas()
     }
 
+    #[inline]
     pub fn offscreen_canvas(&self) -> LedCanvas {
         self.led_matrix.offscreen_canvas()
     }
@@ -44,9 +52,10 @@ impl Matrix {
 
         opts.set_hardware_mapping("adafruit-hat-pwm");
         opts.set_hardware_pulsing(true);
+        opts.set_scan_mode(1);
 
         opts.set_refresh_rate(false);
-        opts.set_brightness(50)?;
+        opts.set_brightness(30)?;
         opts.set_pwm_bits(8)?;
         opts.set_pwm_lsb_nanoseconds(500);
         opts.set_limit_refresh(80);

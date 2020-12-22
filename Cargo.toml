@@ -12,7 +12,17 @@ debug-emulator = []
 [dependencies]
 rpi-led-matrix = { version = "0.2", features = ["embeddedgraphics"] }
 embedded-graphics = "0.6"
-profont = "0.4"
+# profont = "0.4" # delete?
 chrono = "0.4"
 spin_sleep = "1.0"
-clap = "2.33"
+# clap = "2.33" # arg parser, is it required?
+byteorder = "1.3"
+libc = "0.2"
+
+[profile.release]
+opt-level = 3
+debug = false
+debug-assertions = false
+lto = true
+codegen-units = 1
+panic = "abort"

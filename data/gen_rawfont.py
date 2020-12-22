@@ -76,7 +76,7 @@ class RawFont:
             if not self.calculate_max_bounds():
                 return None
 
-            return self.normalized(self)
+            return self.get_normalized_glyph(self)
 
         data = []
 
@@ -262,6 +262,7 @@ def print_preview(rf: RawFont):
             #(glyph.bbW + glyph.bbX, glyph.bbH - glyph.bbY)
 
             data, places = rf.get_normalized_glyph(glyph)
+            print("Payload: ", data)
             for row in range(len(data)):
                 for i in range(places):
                     if i >= 0:
@@ -270,43 +271,54 @@ def print_preview(rf: RawFont):
             print()
 
 def generate_regular_rawfont(rf: RawFont) -> bool:
-    # only ascii standard range
-    return rf.add_range(' ', '~')
-
-def write_regular_rawfont(filename:str, rf: RawFont, table_filename: Optional[str]=None) -> bool:
-    pass
-
-def generate_reduced_rawfont(rf: RawFont) -> bool:
     failed = False
 
-    # ascii symbols + numbers
-    failed = failed or not rf.add_range('+', ':')
-
-    # ascii only ?
-    failed = failed or not rf.add_range('?', '?')
-
-    # ascii uppercase A to F
-    failed = failed or not rf.add_range('A', 'F')
-    failed = failed or not rf.add_range('a', 'g') #
+    # only ascii standard range
+    failed = failed or not rf.add_range(' ', '~')
 
     failed = failed or not rf.calculate_max_bounds()
     return not failed
 
-def write_reduced_rawfont(filename:str, rf: RawFont, table_filename: Optional[str]=None) -> bool:
+def write_regular_rawfont(filename:str, rf: RawFont, table_filename: Optional[str]=None) -> bool:
     rftable = []
     with open(filename, "wb") as f:
-        count = 0
+        w = Writer(f)
+        
+        byte_index = 0
         for r in rf.ranges:
             for glyph in r.glyph_range:
                 data, places = rf.get_normalized_glyph(glyph)
-                rftable.append((count, glyph))
+                rftable.append((byte_index, places, glyph))
+
+                if places > 64:
+                    print("Error: Glyph too large, Max width: 64.")
+                    return False
+
+                write_function = w.write_u64
+                byte_size = 8
+
+                if places <= 8:
+                    write_function = w.write_u8
+                    byte_size = 1
+                
+                elif places <= 16:
+                    write_function = w.write_u16
+                    byte_size = 2
+                
+                elif places <= 32:
+                    write_function = w.write_u32
+                    byte_size = 4
 
                 for row in data:
-                    f.write(struct.pack(">I", row))
-                    count += 1
+                    write_function(row)
+                    byte_index += byte_size
+
+            if byte_index > 65535:
+                print("Error: Font too large, Max size: 66K.")
+                return False
 
     if table_filename is None:
-        print("Error: Reduced rawfont requires rftable output filename to be present")
+        print("Error: This rawfont type requires rftable output filename to be present")
         return False
 
     with open(table_filename, "wb") as f:
@@ -314,8 +326,9 @@ def write_reduced_rawfont(filename:str, rf: RawFont, table_filename: Optional[st
         
         w.write_u16(len(rftable)) # length
 
-        for index, glyph in rftable:
-            w.write_u16(index)      # index
+        for index, places, glyph in rftable:
+            w.write_u16(index)      # byte index
+            w.write_u8(places)      # bit size
             w.write_i8(glyph.bbX)   # x
             w.write_i8(glyph.bbY)   # y
             w.write_u8(glyph.bbW)   # w
@@ -325,10 +338,28 @@ def write_reduced_rawfont(filename:str, rf: RawFont, table_filename: Optional[st
 
     return False
 
+def generate_reduced_rawfont(rf: RawFont) -> bool:
+    failed = False
+
+    # ascii symbols + numbers [43:58]
+    failed = failed or not rf.add_range('+', ':')
+
+    # ascii only `?` [63]
+    failed = failed or not rf.add_range('?', '?')
+
+    # ascii uppercase A to F [65:70]
+    failed = failed or not rf.add_range('A', 'F')
+
+    failed = failed or not rf.calculate_max_bounds()
+    return not failed
+
+def write_reduced_rawfont(filename:str, rf: RawFont, table_filename: Optional[str]=None) -> bool:
+    return write_regular_rawfont(filename, rf, table_filename)
+
 def generate_complex_rawfont(rf: RawFont) -> bool:
     failed = False
 
-    # ascii standard (' ' -> '~')
+    # ascii standard (' ' -> '~') [32:126]
     failed = failed or not rf.add_range(' ', '~')
 
     failed = failed or not rf.calculate_max_bounds()

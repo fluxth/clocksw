@@ -5,8 +5,8 @@ use std::time;
 use spin_sleep::{ SpinSleeper };
 
 pub struct App {
-    matrix: Matrix,
-    display: Display,
+    matrix: Option<Matrix>,
+    display: Option<Display>,
 }
 
 const FPS: f32 = 20.;
@@ -17,15 +17,34 @@ const FPS_DURATION: time::Duration = time::Duration::from_nanos(FPS_PERIOD_NS);
 impl App {
 
     pub fn run(&mut self) {
-        let mut canvas = self.matrix.offscreen_canvas();
+
+        // TODO: Handle unwraps
+        self.matrix = Some(Matrix::new().unwrap());
+        self.display = Some(Display::new());
+        
+        // TODO: Handle panic outputs cleanly
+        let matrix = match self.matrix.as_ref() {
+            Some(r) => r,
+            None => panic!("LED matrix failed to initialize!"),
+        };
+
+        let display = match self.display.as_mut() {
+            Some(r) => r,
+            None => panic!("Renderer failed to initialize!"),
+        };
+
+        let mut canvas = matrix.offscreen_canvas();
 
         let sleeper = SpinSleeper::default();
         let mut last_draw: time::Instant;
         let mut elapsed: time::Duration;
+
+        display.activate_display();
+        
         loop {
             last_draw = time::Instant::now();
-            if self.display.draw(&mut canvas) {
-                canvas = self.matrix.swap(canvas);
+            if display.draw(&mut canvas) {
+                canvas = matrix.swap(canvas);
             }
 
             elapsed = time::Instant::now().duration_since(last_draw);
@@ -41,12 +60,10 @@ impl App {
 // Related functions
 impl App {
 
-    pub fn new() -> App {
-        // TODO: Handle unwraps
+    pub const fn new() -> App {
         App { 
-            matrix: Matrix::new().unwrap(),
-            display: Display::new(),
+            matrix: None, 
+            display: None
         }
     }
-
 }

@@ -14,3 +14,4 @@ data/.pylock
 data/fonts/*.rawfont
 data/fonts/*.rawfontc
 data/fonts/*.rftable
+*.sfd

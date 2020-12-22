@@ -9,7 +9,7 @@ CONVERT_SCRIPT = ./gen_rawfont.py
 all: .pylock $(RAW_FILES)
 
 $(RAW_DIR)/%.rawfont: $(BDF_DIR)/%.bdf
-	$(PYTHON) $(CONVERT_SCRIPT) -o $@ $<
+	$(PYTHON) $(CONVERT_SCRIPT) -o $@ --reduced $<
 
 .pylock: requirements.txt
 	$(PYTHON) -m pip install -r requirements.txt
