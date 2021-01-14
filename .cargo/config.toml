@@ -2,12 +2,11 @@
 target = "arm-unknown-linux-gnueabihf"
 
 [target.arm-unknown-linux-gnueabihf]
+# Use lld to cross-link the output binary
 linker = "clang"
 rustflags = [ 
-    "-C", "link-arg=-L/run/media/flux/2TB HDD/vmdata/lib/rpi-rgb-led-matrix/lib", 
+    "-C", "link-arg=-L~/lib/rpi-rgb-led-matrix/lib", 
     "-C", "link-arg=--target=arm-unknown-linux-gnueabihf", 
-    "-C", "link-arg=--sysroot=/home/flux/Documents/rpi_rootfs/rootfs/",
+    "-C", "link-arg=--sysroot=~/lib/rpi_rootfs/rootfs/",
     "-C", "link-arg=-fuse-ld=lld",
-    "-C", "link-arg=-Wl,--dynamic-linker=/lib/ld-uClibc.so.0",
-    "-C", "link-arg=-s",
 ]
