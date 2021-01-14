@@ -2,7 +2,7 @@
 
 smart led wall clock display for raspberry pi
 
-# Building
+## Building
 
 Dependencies for cross-compiling `clocksw`:
 - a linux environment

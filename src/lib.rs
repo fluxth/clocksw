@@ -3,7 +3,6 @@ use std::alloc::System;
 #[global_allocator]
 static A: System = System;
 
-pub mod app;
 pub mod drivers;
 pub mod display;
 pub mod views;
