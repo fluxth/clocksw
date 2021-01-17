@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+#
+# BDF to rawfont packer for clocksw
+# aka. the embedding pixel font data to elf binary thingy
+#
+# (c) fluxth, 2020
+# 
+
 import sys
 import os.path
 import argparse
@@ -12,7 +20,7 @@ def char(str):
 
 class GlyphRange:
     start_codepoint: int
-    # glyph_range: List[Glyph] = []
+    glyph_range: List[Glyph] = []
 
     def __init__(self, start_codepoint: int):
         self.start_codepoint = start_codepoint

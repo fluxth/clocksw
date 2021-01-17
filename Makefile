@@ -1,22 +1,25 @@
-TARGET_DIR = ./target/arm-unknown-linux-guneabihf
+TARGET = clocksw
 
-debug: build/debug .toolchain.lock fonts
+RUST_TARGET_DIR = ./target/arm-unknown-linux-gnueabihf
+OUTPUT_DIR = ./build
+
+debug: $(OUTPUT_DIR)/debug .toolchain.lock fonts
 	cargo build
-	cp $(TARGET_DIR)/debug/clocksw build/debug/
+	cp $(RUST_TARGET_DIR)/debug/$(TARGET) $(OUTPUT_DIR)/debug/
 
-release: build/release .toolchain.lock fonts
+release: $(OUTPUT_DIR)/release .toolchain.lock fonts
 	cargo build --release
-	cp $(TARGET_DIR)/release/clocksw build/release/
-	llvm-strip build/release/clocksw
+	cp $(RUST_TARGET_DIR)/release/$(TARGET) $(OUTPUT_DIR)/release/
+	llvm-strip $(OUTPUT_DIR)/release/$(TARGET)
 
 fonts:
 	$(MAKE) -C data
 
-build/debug: build
-	mkdir -p build/debug
+$(OUTPUT_DIR)/debug:
+	mkdir -p $(OUTPUT_DIR)/debug
 
-build/release:
-	mkdir -p build/release
+$(OUTPUT_DIR)/release:
+	mkdir -p $(OUTPUT_DIR)/release
 
 .toolchain.lock:
 	rustup target add arm-unknown-linux-gnueabihf

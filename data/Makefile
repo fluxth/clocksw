@@ -1,6 +1,7 @@
 BDF_DIR = ./fonts
 OUT_DIR = ./fonts
 
+# Match all files; just in case (tm).
 # BDF_FILES = $(wildcard $(BDF_DIR)/*.bdf)
 # OUT_FILES = $(patsubst $(BDF_DIR)/%.bdf,$(OUT_DIR)/%.rawfont,$(BDF_FILES))
 
