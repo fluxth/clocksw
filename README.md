@@ -8,11 +8,12 @@ Dependencies for cross-compiling `clocksw`:
 - a linux environment
 - rustup
 - clang
-- llvm
 - lld
+- llvm-ar
+- llvm-strip
 - python3
 - Raspberry Pi's `rootfs`
-- [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) (already cross-compiled for arm)
+- [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) (that's already cross-compiled for arm)
 
 With all the dependencies installed, do:
 
