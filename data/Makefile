@@ -14,6 +14,8 @@ REDUCED_RAWFONTS := ArialMT-24 TinyPixel-5
 NORMAL_RAWFONT_FILES = $(patsubst %,$(OUT_DIR)/%.rawfont,$(NORMAL_RAWFONTS))
 REDUCED_RAWFONT_FILES = $(patsubst %,$(OUT_DIR)/%-Reduced.rawfont,$(REDUCED_RAWFONTS))
 
+.PHONY: all clean reset
+
 all: .pip.lock $(NORMAL_RAWFONTS_FILES) $(REDUCED_RAWFONT_FILES)
 
 $(OUT_DIR)/%-Reduced.rawfont: $(BDF_DIR)/%.bdf

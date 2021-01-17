@@ -3,6 +3,8 @@ TARGET = clocksw
 RUST_TARGET_DIR = ./target/arm-unknown-linux-gnueabihf
 OUTPUT_DIR = ./build
 
+.PHONY: debug release fonts
+
 debug: $(OUTPUT_DIR)/debug .toolchain.lock fonts
 	cargo build
 	cp $(RUST_TARGET_DIR)/debug/$(TARGET) $(OUTPUT_DIR)/debug/
