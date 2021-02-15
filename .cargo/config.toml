@@ -3,10 +3,11 @@ target = "arm-unknown-linux-gnueabihf"
 
 [target.arm-unknown-linux-gnueabihf]
 # Use lld to cross-link the output binary
+# Note: change the corresponding paths to your local ones
 linker = "clang"
 rustflags = [ 
-    "-C", "link-arg=-L~/lib/rpi-rgb-led-matrix/lib", 
+    "-C", "link-arg=-L~/libs/rpi-rgb-led-matrix/lib",
     "-C", "link-arg=--target=arm-unknown-linux-gnueabihf", 
-    "-C", "link-arg=--sysroot=~/lib/rpi_rootfs/rootfs/",
+    "-C", "link-arg=--sysroot=~/libs/rpi_rootfs/rootfs",
     "-C", "link-arg=-fuse-ld=lld",
 ]

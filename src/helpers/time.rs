@@ -1,9 +1,9 @@
 extern crate libc;
 use std::ptr;
 
-pub struct LocalTime;
+pub struct CLocalTime;
 
-impl LocalTime {
+impl CLocalTime {
     pub fn now() -> libc::time_t {
         unsafe {
             libc::time(ptr::null_mut())

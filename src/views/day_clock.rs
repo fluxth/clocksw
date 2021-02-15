@@ -2,35 +2,37 @@
 
 // const DAYS_OF_WEEK: [&'static str; 7] = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-use crate::display::{ Display };
-use crate::views::view::{ View, SwitchView };
+use crate::display::Display;
+use crate::views::view::View;
 use crate::helpers::{
     cap_unit_float,
-    time::{ LocalTime }
+    time::CLocalTime
 };
 use crate::views::components::large_digital_clock;
 use crate::utils::get_cpu_temperature;
 
 use std::error::{ Error };
+use std::cell::Cell;
 use rpi_led_matrix::{ LedCanvas, LedColor };
 use embedded_graphics::{
     prelude::*,
     style::PrimitiveStyle,
-    primitives::{ Line },
-    pixelcolor::{ Rgb888 },
+    primitives::Line,
+    pixelcolor::Rgb888,
     egtext, text_style,
 };
 
 use crate::fonts::tinypixel::TinyPixel5;
 
-pub struct DayClockView {
+pub struct DayClockView<'a> {
+    display: &'a Display,
     current_time: libc::time_t,
     current_tm: Option<libc::tm>,
     initialized: bool,
     temperature_cache: f32,
 }
 
-impl DayClockView {
+impl<'a> DayClockView<'a> {
 
     const WEEK_BRIGHTNESS: u8 = 150;
     const COLORS_OF_WEEK: [Rgb888; 7] = [
@@ -178,11 +180,12 @@ impl DayClockView {
 
 }
 
-impl DayClockView {
+impl<'a> DayClockView<'a> {
     const TEXT_COLOR: Rgb888 = Rgb888::new(255, 255, 255);
 
-    pub fn new() -> DayClockView {
+    pub fn new(display: &'a Display) -> DayClockView {
         DayClockView {
+            display,
             current_time: 0,
             current_tm: None,
             initialized: false,
@@ -191,16 +194,25 @@ impl DayClockView {
     }
 }
 
-impl View for DayClockView {
+impl<'a> View for DayClockView<'a> {
 
     fn view_activated(&mut self) {
         // Display::set_brightness(8);
     }
 
     #[inline]
-    fn draw_next_frame(&mut self, canvas: &mut LedCanvas) -> bool {
+    fn update(&mut self) -> bool {
+        if let Some(tm) = self.current_tm {
+            if tm.tm_hour < 7 {
+               // switch night 
+               // TODO: Replace index with enum
+               self.display.current_view_index.set(Some(1));
+               return false
+            }
+        }
+
         if self.current_time == 0 || self.current_time % 10 == 0 {
-            self.current_time = LocalTime::now();
+            self.current_time = CLocalTime::now();
         } else {
             self.current_time += 1;
         }
@@ -208,13 +220,19 @@ impl View for DayClockView {
         match self.current_tm {
             Some(tm) => {
                 self.current_tm = Some(
-                    LocalTime::tm_modify(tm, self.current_time)
+                    CLocalTime::tm_modify(tm, self.current_time)
                 );
             },
             None => {
-                self.current_tm = Some(LocalTime::tm_new(self.current_time));
+                self.current_tm = Some(CLocalTime::tm_new(self.current_time));
             }
         };
+
+        true
+    }
+
+    #[inline]
+    fn draw_next_frame(&mut self, canvas: &mut LedCanvas) -> bool {
 
         // Draw temperature
         let _ = self.draw_temperature(canvas);
@@ -236,23 +254,13 @@ impl View for DayClockView {
         );
 
         if self.initialized {
-            LocalTime::sleep_until(self.current_time + 1);
+            CLocalTime::sleep_until(self.current_time + 1);
         } else {
             self.current_time -= 1;
             self.initialized = true;
         }
 
         true
-    }
-
-    fn should_switch_view(&self) -> SwitchView {
-        if let Some(tm) = self.current_tm {
-            if tm.tm_hour < 7 {
-                return SwitchView::NightClockView
-            }
-        }
-
-        SwitchView::Ignore
     }
 
 }

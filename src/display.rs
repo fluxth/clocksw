@@ -1,22 +1,20 @@
-use crate::views::view::{ View, SwitchView };
-use crate::views::day_clock::DayClockView;
-use crate::views::night_clock::NightClockView;
+use crate::views::view::View;
 
+use std::cell::Cell;
 use rpi_led_matrix::LedCanvas;
 
 pub struct Display {
-    views: Vec<Box<dyn View>>,
-    current_view_index: Option<usize>,
+    pub views: Vec<Box<dyn View>>,
+    pub current_view_index: Cell<Option<usize>>
 }
 
 impl Display {
-
     pub const LED_WIDTH: i32 = 64;
     pub const LED_HEIGHT: i32 = 32;
 
     pub fn switch_view(&mut self, index: usize) -> Result<&mut dyn View, String> {
         if index < self.views.len() {
-            self.current_view_index = Some(index);
+            self.current_view_index.set(Some(index));
             Ok(self.views[index].as_mut())
         } else {
             Err("Error".to_owned())
@@ -24,22 +22,30 @@ impl Display {
     }
 
     pub fn get_current_view(&mut self) -> Option<&mut dyn View> {
-        let index = self.current_view_index?;
+        let index = self.current_view_index.get()?;
         Some(self.views[index].as_mut())
     }
 
     #[inline]
     pub fn draw(&mut self, canvas: &mut LedCanvas) -> bool {
         if let Some(view) = self.get_current_view() {
-            let view = match view.should_switch_view() {
-                SwitchView::DayClockView => self.switch_view(0).unwrap(),
-                SwitchView::NightClockView => self.switch_view(1).unwrap(),
-                SwitchView::Ignore => self.get_current_view().unwrap(),
-            };
+            if view.update() {
+                // TODO: Implement selective draw; make view sleep itself
+                canvas.clear();
+                view.draw_next_frame(canvas)
+            } else {
+                false
+            }
 
-            // TODO: Implement selective draw; make view sleep itself
-            canvas.clear();
-            view.draw_next_frame(canvas)
+            /*let switch_to = view.should_switch_view();
+            let view = match switch_to {
+                SwitchView::Ignore => view,
+                _ => {
+                    let index = switch_to as usize;
+                    // TODO: usize may underflow
+                    self.switch_view(index - 1).unwrap()
+                },
+            };*/
         } else {
             false
         }
@@ -49,15 +55,11 @@ impl Display {
 
 impl Display {
 
-    pub fn new() -> Display {
-        let views: Vec<Box<dyn View>> = vec![
-            Box::new(DayClockView::new()),
-            Box::new(NightClockView::new()),
-        ];
-
-        Display {
+    pub fn new() -> Self {
+        let views: Vec<Box<dyn View>> = Vec::with_capacity(2);
+        Self {
             views,
-            current_view_index: Some(0),
+            current_view_index: Cell::new(None),
         }
     }
 
