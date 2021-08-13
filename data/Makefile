@@ -5,7 +5,7 @@ OUT_DIR = ./fonts
 # BDF_FILES = $(wildcard $(BDF_DIR)/*.bdf)
 # OUT_FILES = $(patsubst $(BDF_DIR)/%.bdf,$(OUT_DIR)/%.rawfont,$(BDF_FILES))
 
-PYTHON = python3
+PYTHON = /usr/bin/env python3
 CONVERT_SCRIPT = ./gen_rawfont.py
 
 NORMAL_RAWFONTS :=
