@@ -2,6 +2,8 @@
 
 smart led wall clock display for raspberry pi
 
+![clocksw in action!](https://raw.githubusercontent.com/fluxth/clocksw/master/docs/clocksw.png)
+
 ## Building
 
 Dependencies for cross-compiling `clocksw`:
